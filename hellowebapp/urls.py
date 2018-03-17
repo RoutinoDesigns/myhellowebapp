@@ -2,6 +2,9 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.views.generic import TemplateView
 from collection import views
+from django.conf.urls import url, include
+
+
 
 urlpatterns = [
     url(r'^$', views.index, name='home'),
@@ -18,4 +21,8 @@ urlpatterns = [
         views.edit_thing,
         name='edit_thing'),
     url(r'^admin/', admin.site.urls),
+	url(r'^accounts/', 
+        include('registration.backends.simple.urls')),
+    url(r'^admin/', admin.site.urls),
+
 ]
