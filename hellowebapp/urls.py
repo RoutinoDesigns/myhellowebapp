@@ -10,7 +10,10 @@ from django.contrib.auth.views import (
 )
 from django.conf.urls import url
 from django.contrib import admin
-from django.views.generic import TemplateView
+# added RedirectView to this import statement
+from django.views.generic import (TemplateView, 
+    RedirectView,
+)
 from collection import views
 from django.conf.urls import url, include
 
@@ -60,12 +63,12 @@ urlpatterns = [
         include('registration.backends.simple.urls')),
     url(r'^admin/', admin.site.urls),
 	url(r'^accounts/register/$', 
-    MyRegistrationView.as_view(),
-    name='registration_register'),
+		MyRegistrationView.as_view(),
+		name='registration_register'),
 	url(r'^accounts/create_thing/$', views.create_thing, 
-    name='registration_create_thing'),
+		name='registration_create_thing'),
 	url(r'^accounts/', 
-    include('registration.backends.default.urls')),
+		include('registration.backends.default.urls')),
 	url(r'^admin/', admin.site.urls),
 # new url definitions
     url(r'^accounts/password/change/$', password_change, {
@@ -74,4 +77,24 @@ urlpatterns = [
     url(r'^accounts/password/change/done/$', password_change_done, 
         {'template_name': 'registration/password_change_done.html'},
         name='password_change_done'),
+	
+# our new browse flow
+	url(r'^browse/name/$',
+		views.browse_by_name, name='browse'),
+	url(r'^browse/name/(?P<initial>[-\w]+)/$', 
+		views.browse_by_name, name='browse_by_name'),
+
+# password reset URLs
+	url(r'^accounts/password/reset/$', 
+		password_reset,
+		{'template_name': 'registration/password_reset_form.html'},
+		name="password_reset"),
+		
+# our new redirect view
+	url(r'^browse/$', RedirectView.as_view(pattern_name='browse', permanent=True)),
+	url(r'^browse/name/$', views.browse_by_name, name='browse'),
+	url(r'^browse/name/(?P<initial>[-\w]+)/$', views.browse_by_name, name='browse_by_name'),
+	url(r'^things/$', RedirectView.as_view(pattern_name='browse', permanent=True)),
+	url(r'^things/(?P<slug>[-\w]+)/$', views.thing_detail, name='thing_detail'),
+	url(r'^things/(?P<slug>[-\w]+)/edit/$', views.edit_thing, name='edit_thing'),
 ]
